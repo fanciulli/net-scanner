@@ -1,6 +1,10 @@
 {
   "packageManager": "yarn@4.5.0",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.mjs"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "netmask": "^2.0.2"
   }
 }
