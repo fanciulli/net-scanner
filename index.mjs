@@ -1,6 +1,6 @@
-import { printHeader } from "./misc.mjs";
+import { printHeader } from "./src/misc.mjs";
 import { Command } from "commander";
-import { Scanner } from "./scanner.mjs";
+import { scan } from "./src/scanner.mjs";
 
 const program = new Command();
 
@@ -17,6 +17,5 @@ execute();
 async function execute() {
   await printHeader();
 
-  let scanner = new Scanner(options.network);
-  await scanner.scan();
+  await scan(options.network);
 }
