@@ -6,5 +6,8 @@
   "dependencies": {
     "commander": "^12.1.0",
     "netmask": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/netmask": "^2.0.5"
   }
 }
