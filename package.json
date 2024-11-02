@@ -4,7 +4,13 @@
     "start": "node index.mjs"
   },
   "dependencies": {
-    "commander": "^12.1.0",
-    "netmask": "^2.0.2"
+    "commander": "12.1.0",
+    "netmask": "2.0.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.14.0",
+    "@types/netmask": "^2.0.5",
+    "eslint": "^9.14.0",
+    "globals": "^15.11.0"
   }
 }

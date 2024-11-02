@@ -1,7 +1,6 @@
-import { printHeader } from "./misc.mjs";
+import { printHeader } from "./src/misc.mjs";
 import { Command } from "commander";
-import { Netmask } from "netmask";
-import { Scanner } from "./scanner.mjs";
+import { scan } from "./src/scanner.mjs";
 
 const program = new Command();
 
@@ -13,11 +12,10 @@ program
   .parse(process.argv);
 const options = program.opts();
 
-printHeader();
-console.log(`Scanning network ${options.network}`);
-console.log("");
+execute();
 
-var block = new Netmask(options.network);
-block.forEach((ip, long, index) => {
-  console.log(`Scanning IP address ${ip}`);
-});
+async function execute() {
+  await printHeader();
+
+  await scan(options.network);
+}
