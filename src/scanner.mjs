@@ -1,17 +1,26 @@
-import { Netmask } from "netmask";
+import { Configuration } from "./configuration.mjs";
+import { info, error } from "./logging.mjs";
+import { promisify } from "node:util";
+import child_process from "node:child_process";
+const exec = promisify(child_process.exec);
 
-async function scan(network) {
-  console.log(`Scanning network ${network}`);
-  console.log("");
+async function scanTarget(target) {
+  info(`Scanning host ${target}`);
 
-  var block = new Netmask(network);
-  block.forEach(function (ip) {
-    // TODO: Move this to a proper destination
-    let regex = new RegExp("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
-    if (regex.test(ip)) {
-      console.log(`Scanning IP address ${ip}`);
-    }
-  });
+  const { stdout, stderr } = await exec("nmap -A -oX scan.xml " + target);
+  info(stdout);
+  error(stderr);
+}
+
+async function scan(configFile) {
+  let config = new Configuration();
+  await config.load(configFile);
+
+  if (config.target) {
+    await scanTarget(config.target);
+  } else {
+    throw Error("Nothing to do");
+  }
 }
 
 export { scan };
