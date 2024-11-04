@@ -1,6 +1,7 @@
 import { printHeader } from "./src/misc.mjs";
 import { Command } from "commander";
 import { scan } from "./src/scanner.mjs";
+import { error } from "./src/logging.mjs";
 
 const program = new Command();
 
@@ -15,7 +16,11 @@ const options = program.opts();
 async function execute() {
   await printHeader();
 
-  await scan(options.config);
+  try {
+    await scan(options.config);
+  } catch (err) {
+    error(err.message);
+  }
 }
 
 execute();
