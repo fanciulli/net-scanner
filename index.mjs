@@ -7,15 +7,15 @@ const program = new Command();
 program
   .name("net-scanner")
   .description("Scan a network for the connected devices")
-  .requiredOption("-n, --network [netmask]", "Network to scan for devices")
+  .requiredOption("-c, --config [path]", "Path to configuration file")
   .showHelpAfterError()
   .parse(process.argv);
 const options = program.opts();
 
-execute();
-
 async function execute() {
   await printHeader();
 
-  await scan(options.network);
+  await scan(options.config);
 }
+
+execute();
