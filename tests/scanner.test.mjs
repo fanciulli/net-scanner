@@ -43,7 +43,7 @@ test("throws an Error if configuration file is invalid (1)", async () => {
 });
 
 test("scans target", async () => {
-  await cp("./tests/resources/config-scan.json", testConfigFilePath);
+  await cp("./tests/resources/test-config-scan.json", testConfigFilePath);
   await scan(testConfigFilePath);
 
   const targetInfoString = await readFile("targetInfo.json");
