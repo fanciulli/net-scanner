@@ -1,6 +1,10 @@
 name: Codacy Coverage Reporter
 
-on: ["push"]
+on:
+ workflow_run:
+    workflows: [ "Node.js CI" ]
+    types:
+      - completed
 
 jobs:
   codacy-coverage-reporter:
