@@ -35,7 +35,7 @@ test("throws an Error if configuration file is invalid (1)", async () => {
 test("reads configuration from file", async () => {
   expect.assertions(1);
 
-  await cp("./tests/resources/config-scan.json", testConfigFilePath);
+  await cp("tests/resources/config-scan.json", testConfigFilePath);
   await config.load(testConfigFilePath);
 
   expect(config.target).toMatch("192.168.0.2");
