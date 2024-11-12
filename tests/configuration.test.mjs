@@ -1,6 +1,6 @@
 import { expect, test } from "@jest/globals";
 import { Configuration } from "../src/configuration.mjs";
-import { writeFile, unlink } from "node:fs/promises";
+import { writeFile, unlink, cp } from "node:fs/promises";
 
 const testConfigFilePath = "/tmp/config.json";
 let config = new Configuration();
@@ -34,14 +34,11 @@ test("throws an Error if configuration file is invalid (1)", async () => {
 
 test("reads configuration from file", async () => {
   expect.assertions(1);
-  const testConfigData = {
-    target: "192.168.0.1",
-  };
 
-  await writeFile(testConfigFilePath, JSON.stringify(testConfigData));
+  await cp("./tests/resources/test-config-scan.json", testConfigFilePath);
   await config.load(testConfigFilePath);
 
-  expect(config.target).toMatch("192.168.0.1");
+  expect(config.target).toMatch("192.168.0.2");
 
   await unlink(testConfigFilePath);
 });
