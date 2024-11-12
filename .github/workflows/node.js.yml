@@ -21,9 +21,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: LIsting checkout folder (Debugging GitHub Actions workflow)
-      run: |
-        ls -la  
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
