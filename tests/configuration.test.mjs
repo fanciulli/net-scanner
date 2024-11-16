@@ -39,6 +39,24 @@ test("reads configuration from file", async () => {
   await config.load(testConfigFilePath);
 
   expect(config.target).toMatch("192.168.0.2");
+  expect(config.logger).toMatch(undefined);
+
+  await unlink(testConfigFilePath);
+});
+
+test("reads configuration from file with logger", async () => {
+  expect.assertions(1);
+
+  await cp(
+    "./tests/resources/test-config-scan-log-console.json",
+    testConfigFilePath
+  );
+  await config.load(testConfigFilePath);
+
+  expect(config.target).toMatch("192.168.0.2");
+  expect(config.logger).toMatch({
+    transport: "console",
+  });
 
   await unlink(testConfigFilePath);
 });

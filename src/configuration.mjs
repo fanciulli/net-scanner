@@ -12,6 +12,43 @@ const configSchema = {
       type: "string",
       oneOf: [{ format: "ipv4" }],
     },
+    logger: {
+      type: "object",
+      properties: {
+        transport: {
+          type: "string",
+          enum: ["console", "slack"],
+        },
+        target: {
+          type: "string",
+        },
+        level: {
+          type: "string",
+          enum: ["info", "debug"],
+        },
+        options: {
+          type: "object",
+          properties: {
+            webhookUrl: {
+              type: "string",
+            },
+            channel: {
+              type: "string",
+            },
+            username: {
+              type: "string",
+            },
+            icon_emoji: {
+              type: "string",
+            },
+          },
+          required: ["webhookUrl", "channel", "username", "icon_emoji"],
+          additionalProperties: false,
+        },
+      },
+      required: ["transport"],
+      additionalProperties: false,
+    },
   },
   required: ["target"],
   additionalProperties: false,
@@ -38,6 +75,14 @@ class Configuration {
   get target() {
     if (this._config) {
       return this._config.target;
+    } else {
+      return undefined;
+    }
+  }
+
+  get logger() {
+    if (this._config && this._config.logger) {
+      return this._config.logger;
     } else {
       return undefined;
     }
