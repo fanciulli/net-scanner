@@ -16,10 +16,10 @@ function initLogger(configuration) {
             target: "@youngkiu/pino-slack-webhook",
             level: configLogger.level,
             options: {
-              webhookUrl: configLogger.options.webhookUrl,
-              channel: configLogger.options.channel,
-              username: configLogger.options.username,
-              icon_emoji: configLogger.options.icon_emoji,
+              webhookUrl: configLogger.webhookUrl,
+              channel: configLogger.channel,
+              username: configLogger.username,
+              icon_emoji: configLogger.icon_emoji,
             },
           },
         });
