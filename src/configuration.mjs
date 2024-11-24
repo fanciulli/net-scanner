@@ -5,54 +5,7 @@ import addFormats from "ajv-formats";
 const ajvInstance = new Ajv();
 addFormats(ajvInstance);
 
-const configSchema = {
-  type: "object",
-  properties: {
-    target: {
-      type: "string",
-      oneOf: [{ format: "ipv4" }],
-    },
-    logger: {
-      type: "object",
-      properties: {
-        transport: {
-          type: "string",
-          enum: ["console", "slack"],
-        },
-        target: {
-          type: "string",
-        },
-        level: {
-          type: "string",
-          enum: ["info", "debug"],
-        },
-        options: {
-          type: "object",
-          properties: {
-            webhookUrl: {
-              type: "string",
-            },
-            channel: {
-              type: "string",
-            },
-            username: {
-              type: "string",
-            },
-            icon_emoji: {
-              type: "string",
-            },
-          },
-          required: ["webhookUrl", "channel", "username", "icon_emoji"],
-          additionalProperties: false,
-        },
-      },
-      required: ["transport"],
-      additionalProperties: false,
-    },
-  },
-  required: ["target"],
-  additionalProperties: false,
-};
+import { configSchema } from "./configurationSchema.mjs";
 
 const configValidator = ajvInstance.compile(configSchema);
 
@@ -64,11 +17,11 @@ class Configuration {
     let configuration = JSON.parse(configFileContent);
 
     const valid = configValidator(configuration);
-    if (!valid) {
+    if (valid) {
+      this._config = configuration;
+    } else {
       this._config = undefined;
       throw Error("Configuration is not valid");
-    } else {
-      this._config = configuration;
     }
   }
 
@@ -84,7 +37,9 @@ class Configuration {
     if (this._config && this._config.logger) {
       return this._config.logger;
     } else {
-      return undefined;
+      return {
+        transport: "console",
+      };
     }
   }
 }
