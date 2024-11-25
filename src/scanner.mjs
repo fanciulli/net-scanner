@@ -63,17 +63,13 @@ async function scan(configFile) {
 
   initLogger(config);
 
-  if (config.target) {
-    await scanTarget(config.target);
-    const targetInfo = await collectTargetInfo();
-    if (targetInfo) {
-      await analyseTargetInfo(targetInfo);
-      await saveTargetInfo(targetInfo);
-    } else {
-      info(`Cannot retrieve information for host ${config.target}`);
-    }
+  await scanTarget(config.target);
+  const targetInfo = await collectTargetInfo();
+  if (targetInfo) {
+    await analyseTargetInfo(targetInfo);
+    await saveTargetInfo(targetInfo);
   } else {
-    throw Error("Nothing to do");
+    info(`Cannot retrieve information for host ${config.target}`);
   }
 }
 
