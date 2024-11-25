@@ -5,17 +5,7 @@ import addFormats from "ajv-formats";
 const ajvInstance = new Ajv();
 addFormats(ajvInstance);
 
-const configSchema = {
-  type: "object",
-  properties: {
-    target: {
-      type: "string",
-      oneOf: [{ format: "ipv4" }],
-    },
-  },
-  required: ["target"],
-  additionalProperties: false,
-};
+import { configSchema } from "./configurationSchema.mjs";
 
 const configValidator = ajvInstance.compile(configSchema);
 
@@ -27,11 +17,11 @@ class Configuration {
     let configuration = JSON.parse(configFileContent);
 
     const valid = configValidator(configuration);
-    if (!valid) {
+    if (valid) {
+      this._config = configuration;
+    } else {
       this._config = undefined;
       throw Error("Configuration is not valid");
-    } else {
-      this._config = configuration;
     }
   }
 
@@ -40,6 +30,16 @@ class Configuration {
       return this._config.target;
     } else {
       return undefined;
+    }
+  }
+
+  get logger() {
+    if (this._config && this._config.logger) {
+      return this._config.logger;
+    } else {
+      return {
+        transport: "console",
+      };
     }
   }
 }

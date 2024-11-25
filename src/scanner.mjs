@@ -1,5 +1,5 @@
 import { Configuration } from "./configuration.mjs";
-import { info } from "./logging.mjs";
+import { initLogger, info } from "./logging.mjs";
 import { parseStringPromise as xmlParse } from "xml2js";
 import { readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
@@ -16,44 +16,63 @@ async function collectTargetInfo() {
   const xml = await readFile("scan.xml");
   const xmlAsObj = await xmlParse(xml);
 
-  const host = xmlAsObj.nmaprun.host[0];
-  const hostStatus = host.status[0].$.state;
+  if (xmlAsObj.nmaprun.host) {
+    const host = xmlAsObj.nmaprun.host[0];
+    const hostStatus = host.status[0].$.state;
 
-  const addresses = host.address;
+    const addresses = host.address;
 
-  const ipv4AddressSection = addresses.find(
-    (address) => address.$.addrtype == "ipv4"
-  );
-  const ipv4Address = ipv4AddressSection.$.addr;
+    const ipv4AddressSection = addresses.find(
+      (address) => address.$.addrtype == "ipv4"
+    );
+    const ipv4Address = ipv4AddressSection.$.addr;
 
-  const macAddressSection = addresses.find(
-    (address) => address.$.addrtype == "mac"
-  );
-  const macAddress = macAddressSection.$.addr;
-  const vendor = macAddressSection.$.vendor;
+    const macAddressSection = addresses.find(
+      (address) => address.$.addrtype == "mac"
+    );
+    const macAddress = macAddressSection.$.addr;
+    const vendor = macAddressSection.$.vendor;
 
-  return {
-    status: hostStatus,
-    address: ipv4Address,
-    mac: macAddress,
-    vendor: vendor,
-  };
+    return {
+      status: hostStatus,
+      address: ipv4Address,
+      mac: macAddress,
+      vendor: vendor,
+    };
+  }
 }
 
 async function saveTargetInfo(targetInfo) {
   await writeFile("targetInfo.json", JSON.stringify(targetInfo));
 }
 
+async function analyseTargetInfo(targetInfo) {
+  // Currently doing nothing, just printing out info
+
+  const message =
+    "------------------------------------\n" +
+    `IP Address: ${targetInfo.address}\n` +
+    `MAC Address: ${targetInfo.mac}\n` +
+    `Vendor: ${targetInfo.vendor}\n` +
+    `Status: ${targetInfo.status}\n` +
+    "------------------------------------";
+
+  info(message);
+}
+
 async function scan(configFile) {
   let config = new Configuration();
   await config.load(configFile);
 
-  if (config.target) {
-    await scanTarget(config.target);
-    const targetInfo = await collectTargetInfo();
+  initLogger(config);
+
+  await scanTarget(config.target);
+  const targetInfo = await collectTargetInfo();
+  if (targetInfo) {
+    await analyseTargetInfo(targetInfo);
     await saveTargetInfo(targetInfo);
   } else {
-    throw Error("Nothing to do");
+    info(`Cannot retrieve information for host ${config.target}`);
   }
 }
 

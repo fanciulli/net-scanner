@@ -1,0 +1,11 @@
+{
+  "target": "192.168.0.2",
+  "logger": {
+    "transport": "slack",
+    "level": "info",
+    "webhookUrl": "https://hooks.slack.com/services/xxx/xxx/xxx",
+    "channel": "#test-channel",
+    "username": "webhookbot",
+    "icon_emoji": ":ghost:"
+  }
+}
