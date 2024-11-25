@@ -1,4 +1,4 @@
-import { printHeader } from "./src/misc.mjs";
+import { readFile } from "node:fs/promises";
 import { Command } from "commander";
 import { scan } from "./src/scanner.mjs";
 import { error } from "./src/logging.mjs";
@@ -14,7 +14,12 @@ program
 const options = program.opts();
 
 async function execute() {
-  await printHeader();
+  const header = await readFile("./res/header.txt", "utf-8");
+  console.log(header);
+  console.log();
+  console.log(
+    "Application output may be redirected to other transports. Please check configuration file."
+  );
 
   try {
     await scan(options.config);
