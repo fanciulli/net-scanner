@@ -2,10 +2,16 @@ import { expect, test, jest } from "@jest/globals";
 import { readFile, writeFile, unlink, cp } from "node:fs/promises";
 
 jest.unstable_mockModule("node:child_process", () => ({
-  exec: jest.fn((command, callback) => {
-    expect(command).toMatch("nmap -sn -oX scan.xml 192.168.0.2");
-    cp("tests/resources/nmap.192.168.0.2.xml", "scan.xml").then(callback);
-  }),
+  exec: jest
+    .fn()
+    .mockImplementationOnce((command, callback) => {
+      expect(command).toMatch("nmap -sn -oX scan.xml 192.168.0.2");
+      cp("tests/resources/nmap.192.168.0.2.xml", "scan.xml").then(callback);
+    })
+    .mockImplementationOnce((command, callback) => {
+      expect(command).toMatch("nmap -sn -oX scan.xml 192.168.0.2");
+      cp("tests/resources/nmap.empty.xml", "scan.xml").then(callback);
+    }),
 }));
 
 const { scan } = await import("../src/scanner.mjs");
@@ -42,7 +48,22 @@ test("throws an Error if configuration file is invalid (1)", async () => {
   }
 });
 
-test("scans target", async () => {
+test("Scans target", async () => {
+  await cp("./tests/resources/test-config-scan.json", testConfigFilePath);
+  await scan(testConfigFilePath);
+
+  const targetInfoString = await readFile("targetInfo.json");
+  const targetInfo = JSON.parse(targetInfoString);
+
+  expect(targetInfo.status).toMatch("up");
+  expect(targetInfo.address).toMatch("192.168.0.2");
+  expect(targetInfo.mac).toMatch("11:22:33");
+  expect(targetInfo.vendor).toMatch("Vendor");
+
+  await unlink(testConfigFilePath);
+});
+
+test("Scans target but nothong found", async () => {
   await cp("./tests/resources/test-config-scan.json", testConfigFilePath);
   await scan(testConfigFilePath);
 
