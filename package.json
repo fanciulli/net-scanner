@@ -22,7 +22,7 @@
         "statements": -10
       }
     },
-    "testRegex": "tests/.*.mjs",
+    "testRegex": "tests/.*\\.test\\.mjs",
     "transform": {}
   },
   "dependencies": {
