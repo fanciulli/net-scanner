@@ -48,13 +48,16 @@ async function saveTargetInfo(targetInfo) {
 
 async function analyseTargetInfo(targetInfo) {
   // Currently doing nothing, just printing out info
-  info("");
-  info("Found the following device:");
-  info(`IP Address: ${targetInfo.address}`);
-  info(`MAC Address: ${targetInfo.mac}`);
-  info(`Vendor: ${targetInfo.vendor}`);
-  info(`Status: ${targetInfo.status}`);
-  info("");
+
+  const message =
+    "------------------------------------\n" +
+    `IP Address: ${targetInfo.address}\n` +
+    `MAC Address: ${targetInfo.mac}\n` +
+    `Vendor: ${targetInfo.vendor}\n` +
+    `Status: ${targetInfo.status}\n` +
+    "------------------------------------";
+
+  info(message);
 }
 
 async function scan(configFile) {
