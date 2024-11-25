@@ -56,8 +56,6 @@ test("throws an Error if configuration file is invalid (1)", async () => {
 });
 
 test("reads configuration from file", async () => {
-  expect.assertions(3);
-
   await copyConfigurationFile(
     "./tests/resources/test-config-scan.json",
     testConfigFilePath
@@ -73,8 +71,6 @@ test("reads configuration from file", async () => {
 });
 
 test("reads configuration from file with Slack logger", async () => {
-  expect.assertions(8);
-
   await copyConfigurationFile(
     "./tests/resources/test-config-scan-slack.json",
     testConfigFilePath
@@ -97,8 +93,6 @@ test("reads configuration from file with Slack logger", async () => {
 });
 
 test("reads configuration from file without logger specified", async () => {
-  expect.assertions(3);
-
   const testConfigData = {
     target: "192.168.0.2",
   };
