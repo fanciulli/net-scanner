@@ -10,6 +10,12 @@ import {
 const testConfigFilePath = "/tmp/config.json";
 const config = new Configuration();
 
+test("isTargetNetwork", () => {
+  expect(config.target).toBeUndefined;
+  expect(config.netmask).toBeUndefined;
+  expect(config.isTargetNetwork()).toBe(false);
+});
+
 test("throws an Error if configuration file cannot be accessed", async () => {
   expect.assertions(2);
   try {
@@ -21,7 +27,6 @@ test("throws an Error if configuration file cannot be accessed", async () => {
 });
 
 test("throws an Error if configuration file is not a JSON", async () => {
-  expect.assertions(2);
   try {
     const testConfigData = "FILE = /bin/sh";
 
@@ -29,14 +34,14 @@ test("throws an Error if configuration file is not a JSON", async () => {
     await config.load(testConfigFilePath);
   } catch (error) {
     expect(error.message).toContain("is not valid JSON");
-    expect(config.target).toBe(undefined);
-
-    await deleteConfigurationFile(testConfigFilePath);
+    expect(config.target).toBeUndefined;
+    expect(config.netmask).toBeUndefined;
+    expect(config.isTargetNetwork()).toBe(false);
   }
+  await deleteConfigurationFile(testConfigFilePath);
 });
 
 test("throws an Error if configuration file is invalid (1)", async () => {
-  expect.assertions(2);
   try {
     const testConfigData = {
       target: "INVALID",
@@ -49,10 +54,11 @@ test("throws an Error if configuration file is invalid (1)", async () => {
     await config.load(testConfigFilePath);
   } catch (error) {
     expect(error.message).toMatch("Configuration is not valid");
-    expect(config.target).toBe(undefined);
-
-    await deleteConfigurationFile(testConfigFilePath);
+    expect(config.target).not.toBeUndefined;
+    expect(config.netmask).toBeUndefined;
+    expect(config.isTargetNetwork()).toBe(false);
   }
+  await deleteConfigurationFile(testConfigFilePath);
 });
 
 test("reads configuration from file", async () => {
@@ -64,6 +70,8 @@ test("reads configuration from file", async () => {
   await config.load(testConfigFilePath);
 
   expect(config.target).toMatch("192.168.0.2");
+  expect(config.netmask).toBeUndefined;
+  expect(config.isTargetNetwork()).toBe(false);
   expect(config.logger).toBeDefined();
   expect(config.logger).toHaveProperty("transport", "console");
 
@@ -78,6 +86,8 @@ test("reads configuration from file with Slack logger", async () => {
   await config.load(testConfigFilePath);
 
   expect(config.target).toMatch("192.168.0.2");
+  expect(config.netmask).toBeUndefined;
+  expect(config.isTargetNetwork()).toBe(false);
   expect(config.logger).toBeDefined();
   expect(config.logger).toHaveProperty("transport", "slack");
   expect(config.logger).toHaveProperty("level", "info");
@@ -102,8 +112,25 @@ test("reads configuration from file without logger specified", async () => {
   await config.load(testConfigFilePath);
 
   expect(config.target).toMatch("192.168.0.2");
+  expect(config.netmask).toBeUndefined;
+  expect(config.isTargetNetwork()).toBe(false);
   expect(config.logger).toBeDefined();
   expect(config.logger).toHaveProperty("transport", "console");
 
   await deleteConfigurationFile(testConfigFilePath);
+});
+
+test("reads configuration for a target network", async () => {
+  await copyConfigurationFile(
+    "./tests/resources/test-config-scan-network.json",
+    testConfigFilePath
+  );
+
+  await config.load(testConfigFilePath);
+
+  expect(config.target).toMatch("192.168.0.2");
+  expect(config.netmask).toBe(24);
+  expect(config.isTargetNetwork()).toBe(true);
+  expect(config.logger).toBeDefined();
+  expect(config.logger).toHaveProperty("transport", "console");
 });

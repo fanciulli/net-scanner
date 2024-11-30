@@ -26,10 +26,18 @@ class Configuration {
   }
 
   get target() {
-    if (this._config) {
-      return this._config.target;
+    return this._config?.target;
+  }
+
+  get netmask() {
+    return this._config?.netmask;
+  }
+
+  isTargetNetwork() {
+    if (this._config !== undefined && this._config.netmask !== undefined) {
+      return true;
     } else {
-      return undefined;
+      return false;
     }
   }
 
