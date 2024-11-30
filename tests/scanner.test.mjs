@@ -11,6 +11,10 @@ jest.unstable_mockModule("node:child_process", () => ({
     .mockImplementationOnce((command, callback) => {
       expect(command).toMatch("nmap -sn -oX scan.xml 192.168.0.2");
       cp("tests/resources/nmap.empty.xml", "scan.xml").then(callback);
+    })
+    .mockImplementation((command, callback) => {
+      expect(command).toContain("nmap -sn -oX scan.xml 192.168.0.");
+      cp("tests/resources/nmap.192.168.0.2.xml", "scan.xml").then(callback);
     }),
 }));
 
@@ -63,7 +67,7 @@ test("Scans target", async () => {
   await unlink(testConfigFilePath);
 });
 
-test("Scans target but nothong found", async () => {
+test("Scans target but nothing found", async () => {
   await cp("./tests/resources/test-config-scan.json", testConfigFilePath);
   await scan(testConfigFilePath);
 
@@ -74,6 +78,16 @@ test("Scans target but nothong found", async () => {
   expect(targetInfo.address).toMatch("192.168.0.2");
   expect(targetInfo.mac).toMatch("11:22:33");
   expect(targetInfo.vendor).toMatch("Vendor");
+
+  await unlink(testConfigFilePath);
+});
+
+test("Scans network", async () => {
+  await cp(
+    "./tests/resources/test-config-scan-network.json",
+    testConfigFilePath
+  );
+  await scan(testConfigFilePath);
 
   await unlink(testConfigFilePath);
 });

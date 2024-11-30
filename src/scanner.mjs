@@ -1,14 +1,13 @@
 import { Configuration } from "./configuration.mjs";
-import { initLogger, info } from "./logging.mjs";
+import { initLogger, info, error } from "./logging.mjs";
 import { parseStringPromise as xmlParse } from "xml2js";
 import { readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
+import { Netmask } from "netmask";
 const executeShell = promisify(exec);
 
 async function scanTarget(target) {
-  info(`Scanning host ${target}`);
-
   await executeShell("nmap -sn -oX scan.xml " + target);
 }
 
@@ -60,19 +59,45 @@ async function analyseTargetInfo(targetInfo) {
   info(message);
 }
 
+async function scanHost(host) {
+  try {
+    await scanTarget(host);
+    const targetInfo = await collectTargetInfo();
+    if (targetInfo) {
+      await analyseTargetInfo(targetInfo);
+      await saveTargetInfo(targetInfo);
+    } /*else {
+      info(`Cannot retrieve information for host ${host}`);
+    }*/
+  } catch (ecc) {
+    error(ecc);
+  }
+}
+
 async function scan(configFile) {
   let config = new Configuration();
   await config.load(configFile);
 
   initLogger(config);
 
-  await scanTarget(config.target);
-  const targetInfo = await collectTargetInfo();
-  if (targetInfo) {
-    await analyseTargetInfo(targetInfo);
-    await saveTargetInfo(targetInfo);
+  if (config.isTargetNetwork()) {
+    const networkWithMask = `${config.target}/${config.netmask}`;
+
+    info(`Scanning network ${networkWithMask}`);
+    const netmask = new Netmask(networkWithMask);
+
+    var ips = [];
+    netmask.forEach((ip) => {
+      ips.push(ip);
+    });
+
+    for (const ip of ips) {
+      await scanHost(ip);
+    }
+    info(`Done scanning network ${networkWithMask}`);
   } else {
-    info(`Cannot retrieve information for host ${config.target}`);
+    info("Scanning host");
+    await scanHost(config.target);
   }
 }
 
