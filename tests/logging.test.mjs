@@ -1,7 +1,7 @@
 import { expect, test } from "@jest/globals";
 import { Configuration } from "../src/configuration.mjs";
 import { copyConfigurationFile, deleteConfigurationFile } from "./utils.mjs";
-import { initLogger, logger, info, error } from "../src/logging.mjs";
+import { initLogger, logger, debug, info, error } from "../src/logging.mjs";
 
 const testConfigFilePath = "/tmp/config.json";
 
@@ -9,6 +9,7 @@ test("Console logger initialization", () => {
   expect(logger).toBeUndefined();
   info("TEST");
   error("TEST");
+  debug("TEST");
 });
 
 test("Initialize Console logger", async () => {
@@ -25,6 +26,7 @@ test("Initialize Console logger", async () => {
   expect(logger).toBeDefined();
   info("TEST");
   error("TEST");
+  debug("TEST");
 
   await deleteConfigurationFile(testConfigFilePath);
 });
