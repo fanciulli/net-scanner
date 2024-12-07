@@ -3,7 +3,10 @@ const configSchema = {
   properties: {
     target: {
       type: "string",
-      oneOf: [{ format: "ipv4" }],
+      format: "ipv4",
+    },
+    netmask: {
+      type: "integer",
     },
     logger: {
       type: "object",

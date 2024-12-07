@@ -43,4 +43,12 @@ function error(message) {
   }
 }
 
-export { initLogger, info, error, logger };
+function debug(message) {
+  if (logger) {
+    logger.debug(message);
+  } else {
+    console.log("[DEBUG] " + message);
+  }
+}
+
+export { initLogger, debug, info, error, logger };
