@@ -66,9 +66,7 @@ async function scanHost(host) {
     if (targetInfo) {
       await analyseTargetInfo(targetInfo);
       await saveTargetInfo(targetInfo);
-    } /*else {
-      info(`Cannot retrieve information for host ${host}`);
-    }*/
+    }
   } catch (ecc) {
     error(ecc);
   }
