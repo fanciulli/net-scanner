@@ -3,8 +3,6 @@ import { Configuration } from "../src/configuration.mjs";
 import { copyConfigurationFile, deleteConfigurationFile } from "./utils.mjs";
 import { initLogger, logger, debug, info, error } from "../src/logging.mjs";
 
-const testConfigFilePath = "/tmp/config.json";
-
 test("Console logger initialization", () => {
   expect(logger).toBeUndefined();
   info("TEST");
@@ -15,11 +13,11 @@ test("Console logger initialization", () => {
 test("Initialize Console logger", async () => {
   await copyConfigurationFile(
     "./tests/resources/test-config-scan.json",
-    testConfigFilePath
+    "/tmp/config-console.json"
   );
 
   const configuration = new Configuration();
-  await configuration.load(testConfigFilePath);
+  await configuration.load("/tmp/config-console.json");
 
   initLogger(configuration);
 
@@ -28,21 +26,21 @@ test("Initialize Console logger", async () => {
   error("TEST");
   debug("TEST");
 
-  await deleteConfigurationFile(testConfigFilePath);
+  await deleteConfigurationFile("/tmp/config-console.json");
 });
 
 test("Initialize Slack logger", async () => {
   await copyConfigurationFile(
     "./tests/resources/test-config-scan-slack.json",
-    testConfigFilePath
+    "/tmp/config-slack.json"
   );
 
   const configuration = new Configuration();
-  await configuration.load(testConfigFilePath);
+  await configuration.load("/tmp/config-slack.json");
 
   initLogger(configuration);
 
   expect(logger).toBeDefined();
 
-  await deleteConfigurationFile(testConfigFilePath);
+  await deleteConfigurationFile("/tmp/config-slack.json");
 });
