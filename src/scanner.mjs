@@ -9,6 +9,8 @@ import { getHost, storeHost, updateHost } from "./database.mjs";
 
 const executeShell = promisify(exec);
 
+const NA = "N/A";
+
 async function scanTarget(target) {
   await executeShell("nmap -sn -oX scan.xml " + target);
 }
@@ -26,13 +28,13 @@ async function collectTargetInfo() {
     const ipv4AddressSection = addresses.find(
       (address) => address.$.addrtype == "ipv4"
     );
-    const ipv4Address = ipv4AddressSection.$.addr;
+    const ipv4Address = ipv4AddressSection ? ipv4AddressSection.$.addr : NA;
 
     const macAddressSection = addresses.find(
       (address) => address.$.addrtype == "mac"
     );
-    const macAddress = macAddressSection.$.addr;
-    const vendor = macAddressSection.$.vendor;
+    const macAddress = macAddressSection ? macAddressSection.$.addr : NA;
+    const vendor = macAddressSection ? macAddressSection.$.vendor : NA;
 
     return {
       status: hostStatus,
