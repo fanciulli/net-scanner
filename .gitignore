@@ -132,3 +132,4 @@ dist
 config-scan.json
 scan.xml
 targetInfo.json
+scan-db.sqlite

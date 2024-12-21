@@ -5,6 +5,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
 import { Netmask } from "netmask";
+import { getHost, storeHost, updateHost } from "./database.mjs";
+
 const executeShell = promisify(exec);
 
 async function scanTarget(target) {
@@ -46,8 +48,6 @@ async function saveTargetInfo(targetInfo) {
 }
 
 async function analyseTargetInfo(targetInfo) {
-  // Currently doing nothing, just printing out info
-
   const message =
     "------------------------------------\n" +
     `IP Address: ${targetInfo.address}\n` +
@@ -56,20 +56,32 @@ async function analyseTargetInfo(targetInfo) {
     `Status: ${targetInfo.status}\n` +
     "------------------------------------";
 
-  info(message);
+  const result = getHost(targetInfo.mac);
+  if (result) {
+    if (
+      result["ip"] == targetInfo.address &&
+      result["vendor"] == targetInfo.vendor
+    ) {
+      info(`Host with MAC Address: ${targetInfo.mac} is known`);
+    } else {
+      info(`Host with MAC Address: ${targetInfo.mac} is updated`);
+      updateHost(targetInfo.mac, targetInfo.address, targetInfo.vendor);
+      info(message);
+    }
+  } else {
+    storeHost(targetInfo.mac, targetInfo.address, targetInfo.vendor);
+    info(message);
+  }
 }
 
 async function scanHost(host) {
-  try {
-    await scanTarget(host);
-    const targetInfo = await collectTargetInfo();
-    if (targetInfo) {
-      await analyseTargetInfo(targetInfo);
-      await saveTargetInfo(targetInfo);
-    }
-  } catch (ecc) {
-    error(ecc);
+  await scanTarget(host);
+  const targetInfo = await collectTargetInfo();
+  if (targetInfo) {
+    await analyseTargetInfo(targetInfo);
+    await saveTargetInfo(targetInfo);
   }
+  return true;
 }
 
 async function scan(configFile) {

@@ -21,8 +21,8 @@ test("throws an Error if configuration file cannot be accessed", async () => {
   try {
     await config.load("/bin/missing_file");
   } catch (error) {
-    expect(error.code).toMatch("ENOENT");
-    expect(error.path).toMatch("/bin/missing_file");
+    expect(error.code).toBe("ENOENT");
+    expect(error.path).toBe("/bin/missing_file");
   }
 });
 
@@ -53,7 +53,7 @@ test("throws an Error if configuration file is invalid (1)", async () => {
     );
     await config.load(testConfigFilePath);
   } catch (error) {
-    expect(error.message).toMatch("Configuration is not valid");
+    expect(error.message).toBe("Configuration is not valid");
     expect(config.target).not.toBeUndefined;
     expect(config.netmask).toBeUndefined;
     expect(config.isTargetNetwork()).toBe(false);
@@ -69,7 +69,7 @@ test("reads configuration from file", async () => {
 
   await config.load(testConfigFilePath);
 
-  expect(config.target).toMatch("192.168.0.2");
+  expect(config.target).toBe("192.168.0.2");
   expect(config.netmask).toBeUndefined;
   expect(config.isTargetNetwork()).toBe(false);
   expect(config.logger).toBeDefined();
@@ -85,7 +85,7 @@ test("reads configuration from file with Slack logger", async () => {
   );
   await config.load(testConfigFilePath);
 
-  expect(config.target).toMatch("192.168.0.2");
+  expect(config.target).toBe("192.168.0.2");
   expect(config.netmask).toBeUndefined;
   expect(config.isTargetNetwork()).toBe(false);
   expect(config.logger).toBeDefined();
@@ -111,7 +111,7 @@ test("reads configuration from file without logger specified", async () => {
 
   await config.load(testConfigFilePath);
 
-  expect(config.target).toMatch("192.168.0.2");
+  expect(config.target).toBe("192.168.0.2");
   expect(config.netmask).toBeUndefined;
   expect(config.isTargetNetwork()).toBe(false);
   expect(config.logger).toBeDefined();
@@ -128,7 +128,7 @@ test("reads configuration for a target network", async () => {
 
   await config.load(testConfigFilePath);
 
-  expect(config.target).toMatch("192.168.0.2");
+  expect(config.target).toBe("192.168.0.2");
   expect(config.netmask).toBe(24);
   expect(config.isTargetNetwork()).toBe(true);
   expect(config.logger).toBeDefined();

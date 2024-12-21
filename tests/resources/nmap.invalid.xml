@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<nmaprun scanner="nmap" args="nmap -sn -oX scan.xml 192.168.0.2" start="1731138533" startstr="Sat Nov  9 08:48:53 2024" version="7.95" xmloutputversion="1.05">
+    <verbose level="0"/>
+    <debugging leve
+
+    <runstats>
+<finished time="1731138533" timestr="Sat Nov  9 08:48:53 2024" summary="Nmap done at Sat Nov  9 08:48:53 2024; 1 IP address (1 host up) scanned in 0.12 seconds" elapsed="0.12" exit="success"/>
+    <hosts up="1" down="0" total="1"/>
+</runstats>
+</nmaprun>
