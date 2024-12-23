@@ -1,5 +1,5 @@
 import { Configuration } from "./configuration.mjs";
-import { initLogger, info, error } from "./logging.mjs";
+import { initLogger, info } from "./logging.mjs";
 import { parseStringPromise as xmlParse } from "xml2js";
 import { readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
