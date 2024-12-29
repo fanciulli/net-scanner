@@ -1,7 +1,7 @@
 {
-  "packageManager": "yarn@4.5.0",
+  "packageManager": "npm@9.0.0",
   "scripts": {
-    "start": "node index.mjs",
+    "start": "node --experimental-sqlite index.mjs",
     "test": "node --experimental-vm-modules --experimental-sqlite ./node_modules/.bin/jest --coverage"
   },
   "jest": {
