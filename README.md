@@ -2,7 +2,7 @@
 
 Tool for scanning your home network in search of intruders.
 
-# NMAP
+## NMAP
 
 nmap is being used to scan network and retrieve some information. Since we need to get MAC address from nmap, this needs to be run with root privileges. In order not to run node and net-scanner with root privileges we execute nmap with sudo (for Debian based linx distros).
 In order not to enter password we have to perform a simple setup that allows nmap to run passwordless. 
