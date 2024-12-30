@@ -5,23 +5,23 @@ jest.unstable_mockModule("node:child_process", () => ({
   exec: jest
     .fn()
     .mockImplementationOnce((command, callback) => {
-      expect(command).toBe("nmap -sn -oX scan.xml 192.168.0.2");
+      expect(command).toBe("sudo nmap -sn -oX scan.xml 192.168.0.2");
       cp("tests/resources/nmap.192.168.0.2.xml", "scan.xml").then(callback);
     })
     .mockImplementationOnce((command, callback) => {
-      expect(command).toBe("nmap -sn -oX scan.xml 192.168.0.3");
+      expect(command).toBe("sudo nmap -sn -oX scan.xml 192.168.0.3");
       cp("tests/resources/nmap.192.168.0.3.xml", "scan.xml").then(callback);
     })
     .mockImplementationOnce((command, callback) => {
-      expect(command).toBe("nmap -sn -oX scan.xml 192.168.0.2");
+      expect(command).toBe("sudo nmap -sn -oX scan.xml 192.168.0.2");
       cp("tests/resources/nmap.empty.xml", "scan.xml").then(callback);
     })
     .mockImplementationOnce((command, callback) => {
-      expect(command).toBe("nmap -sn -oX scan.xml 192.168.0.2");
+      expect(command).toBe("sudo nmap -sn -oX scan.xml 192.168.0.2");
       cp("tests/resources/nmap.invalid.xml", "scan.xml").then(callback);
     })
     .mockImplementation((command, callback) => {
-      expect(command).toContain("nmap -sn -oX scan.xml 192.168.0.");
+      expect(command).toContain("sudo nmap -sn -oX scan.xml 192.168.0.");
       cp("tests/resources/nmap.192.168.0.2.xml", "scan.xml").then(callback);
     }),
 }));
