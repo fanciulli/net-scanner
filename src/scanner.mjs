@@ -12,7 +12,7 @@ const executeShell = promisify(exec);
 const NA = "N/A";
 
 async function scanTarget(target) {
-  await executeShell("nmap -sn -oX scan.xml " + target);
+  await executeShell("sudo nmap -sn -oX scan.xml " + target);
 }
 
 async function collectTargetInfo() {
