@@ -7,7 +7,7 @@ Net-scanner is a tool for scanning your home network in search for devices. The 
 ### Node.js
 
 net-scanner runs on node.js v22 LTS. It uses the sqlite module to store the scan results. 
-Further details on sqlite can be found here: https://nodejs.org/docs/latest-v22.x/api/sqlite.html
+Further details on sqlite can be found here: <https://nodejs.org/docs/latest-v22.x/api/sqlite.html>
 
 In order to run net-scanner, the flag --experimental-sqlite shall be added.
 
@@ -37,11 +37,10 @@ net-scanner requires a configuration file in order to properly work. Create a js
 | logger | Object | The optional logger configuration. If no logger section is found net-scanner will use the console transport |
 | transport | Enum | One of 'console' or 'slack', depending of the user choice. Console is the default choice |
 | level | String | A log level for the logger |
-| webhookUrl | URL | For Slack transport, the webhook URL to call. See https://api.slack.com/messaging/webhooks |
+| webhookUrl | URL | For Slack transport, the webhook URL to call. See <https://api.slack.com/messaging/webhooks> |
 | channel | String | For Slack transport, the channel to post log line to |
 | username | String | For Slack transport, the user that will post the log to the channel |
 | icon_emoji | String | For Slack transport, the icon of the user |
-
 
 Example configuration for scanning the network 192.168.0.0/24 and report the found devices to the Slack channel :
 
