@@ -1,12 +1,12 @@
 # Introduction
 
-Net-scanner is a tool for scanning your home network in search of devices. The scan result is stored locally in a sqlite database and is used to compare results between runs. If a device is found on the database it is handled as existing or a possible update of information, otherwise it is considered to be a new device.
+Net-scanner is a tool for scanning your home network in search for devices. The scan results are stored locally in a sqlite database which is used to compare results between runs. If a device is found on the database it is handled as existing or a possible update of information, otherwise it is considered to be a new device.
 
 ## Dependencies
 
 ### Node.js
 
-net-scanner run on node.js v22 LTS. It uses the sqlite module to store the scan results. 
+net-scanner runs on node.js v22 LTS. It uses the sqlite module to store the scan results. 
 Further details on sqlite can be found here: https://nodejs.org/docs/latest-v22.x/api/sqlite.html
 
 In order to run net-scanner, the flag --experimental-sqlite shall be added.
@@ -38,9 +38,9 @@ net-scanner requires a configuration file in order to properly work. Create a js
 | transport | Enum | One of 'console' or 'slack', depending of the user choice. Console is the default choice |
 | level | String | A log level for the logger |
 | webhookUrl | URL | For Slack transport, the webhook URL to call. See https://api.slack.com/messaging/webhooks |
-| channel | String | The channel to post log line to |
-| username | String | The user that will post the log to the channel |
-| icon_emoji | String | The icon of the user |
+| channel | String | For Slack transport, the channel to post log line to |
+| username | String | For Slack transport, the user that will post the log to the channel |
+| icon_emoji | String | For Slack transport, the icon of the user |
 
 
 Example configuration for scanning the network 192.168.0.0/24 and report the found devices to the Slack channel :
