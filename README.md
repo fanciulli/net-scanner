@@ -68,10 +68,6 @@ Example configuration for scanning the network 192.168.0.0/24 and report the fou
         }
     }
 
-
-
-
-
 ## How to run net-scanner
 
 Checkout the source code and open a terminal on the project folder.
