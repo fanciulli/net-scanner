@@ -3,11 +3,11 @@ import { initLogger, info } from "./logging.mjs";
 import { parseStringPromise as xmlParse } from "xml2js";
 import { readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
-import { exec } from "node:child_process";
+import childProcess from "node:child_process";
 import { Netmask } from "netmask";
 import { getHost, storeHost, updateHost } from "./database.mjs";
 
-const executeShell = promisify(exec);
+const executeShell = promisify(childProcess.exec);
 
 const NA = "N/A";
 
