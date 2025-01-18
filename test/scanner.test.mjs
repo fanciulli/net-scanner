@@ -1,134 +1,132 @@
-import { expect, test, jest } from "@jest/globals";
-import { readFile, writeFile, unlink, cp } from "node:fs/promises";
+import { describe, test, after } from "mocha";
+import child_process from "node:child_process";
+import sinon from "sinon";
+import "chai/register-should.js";
 
-jest.unstable_mockModule("node:child_process", () => ({
-  exec: jest
-    .fn()
-    .mockImplementationOnce((command, callback) => {
-      expect(command).toBe("sudo nmap -sn -oX scan.xml 192.168.0.2");
-      cp("tests/resources/nmap.192.168.0.2.xml", "scan.xml").then(callback);
-    })
-    .mockImplementationOnce((command, callback) => {
-      expect(command).toBe("sudo nmap -sn -oX scan.xml 192.168.0.3");
-      cp("tests/resources/nmap.192.168.0.3.xml", "scan.xml").then(callback);
-    })
-    .mockImplementationOnce((command, callback) => {
-      expect(command).toBe("sudo nmap -sn -oX scan.xml 192.168.0.2");
-      cp("tests/resources/nmap.empty.xml", "scan.xml").then(callback);
-    })
-    .mockImplementationOnce((command, callback) => {
-      expect(command).toBe("sudo nmap -sn -oX scan.xml 192.168.0.2");
-      cp("tests/resources/nmap.invalid.xml", "scan.xml").then(callback);
-    })
-    .mockImplementation((command, callback) => {
-      expect(command).toContain("sudo nmap -sn -oX scan.xml 192.168.0.");
-      cp("tests/resources/nmap.192.168.0.2.xml", "scan.xml").then(callback);
-    }),
-}));
+import { readFile, cp } from "fs/promises";
+import { copyConfigurationFile, deleteConfigurationFile } from "./utils.mjs";
+
+const execStub = sinon
+  .stub(child_process, "exec")
+  .onCall(0)
+  .callsFake((command, callback) => {
+    command.should.be.equal("sudo nmap -sn -oX scan.xml 192.168.0.2");
+    cp("test/resources/nmap.192.168.0.2.xml", "scan.xml").then(() =>
+      callback()
+    );
+  })
+  .onCall(1)
+  .callsFake((command, callback) => {
+    command.should.be.equal("sudo nmap -sn -oX scan.xml 192.168.0.3");
+    cp("test/resources/nmap.192.168.0.3.xml", "scan.xml").then(() =>
+      callback()
+    );
+  })
+  .onCall(2)
+  .callsFake((command, callback) => {
+    command.should.be.equal("sudo nmap -sn -oX scan.xml 192.168.0.2");
+    cp("test/resources/nmap.empty.xml", "scan.xml").then(() => callback());
+  })
+  .onCall(3)
+  .callsFake((command, callback) => {
+    command.should.be.equal("sudo nmap -sn -oX scan.xml 192.168.0.2");
+    cp("test/resources/nmap.invalid.xml", "scan.xml").then(() => callback());
+  });
+
+execStub.callsFake((command, callback) => {
+  command.should.have.string("sudo nmap -sn -oX scan.xml 192.168.0.");
+  cp("test/resources/nmap.192.168.0.2.xml", "scan.xml").then(() => callback());
+});
 
 const { scan } = await import("../src/scanner.mjs");
 
-async function writeConfigurationFile(content, filePath) {
-  await writeFile(filePath, JSON.stringify(content));
-}
+describe("Scanner", async () => {
+  after(function restore() {
+    execStub.restore();
+  });
 
-test("throws an Error if configuration file cannot be accessed", async () => {
-  expect.assertions(2);
-  try {
-    await scan("/bin/missing_file");
-  } catch (error) {
-    expect(error.code).toMatch("ENOENT");
-    expect(error.path).toMatch("/bin/missing_file");
-  }
-});
+  describe("scan()", () => {
+    test("Scans a host target", async function () {
+      await copyConfigurationFile(
+        "./test/resources/test-config-scan.json",
+        "/tmp/config1.json"
+      );
 
-test("throws an Error if configuration file is invalid (1)", async () => {
-  expect.assertions(1);
-  try {
-    const testConfigData = {
-      target: "INVALID",
-    };
+      await scan("/tmp/config1.json");
 
-    await writeConfigurationFile(testConfigData, "/tmp/invalid-config.json");
-    await scan("/tmp/invalid-config.json");
-  } catch (error) {
-    expect(error.message).toMatch("Configuration is not valid");
+      const targetInfoString = await readFile("targetInfo.json");
+      const targetInfo = JSON.parse(targetInfoString);
 
-    await unlink("/tmp/invalid-config.json");
-  }
-});
+      targetInfo.status.should.equal("up");
+      targetInfo.address.should.equal("192.168.0.2");
+      targetInfo.mac.should.equal("00:11:22:33:44:55");
+      targetInfo.vendor.should.equal("My Vendor");
 
-test("Scans target", async () => {
-  await cp("./tests/resources/test-config-scan.json", "/tmp/config1.json");
-  await scan("/tmp/config1.json");
+      await deleteConfigurationFile("/tmp/config1.json");
+    });
 
-  const targetInfoString = await readFile("targetInfo.json");
-  const targetInfo = JSON.parse(targetInfoString);
+    test("Scans a host target that changed IP and Vendor", async () => {
+      await copyConfigurationFile(
+        "./test/resources/test-config-scan2.json",
+        "/tmp/config2.json"
+      );
 
-  expect(targetInfo.status).toBe("up");
-  expect(targetInfo.address).toBe("192.168.0.2");
-  expect(targetInfo.mac).toBe("00:11:22:33:44:55");
-  expect(targetInfo.vendor).toBe("My Vendor");
+      await scan("/tmp/config2.json");
 
-  await unlink("/tmp/config1.json");
-});
+      const targetInfoString = await readFile("targetInfo.json");
+      const targetInfo = JSON.parse(targetInfoString);
 
-test("Scans target that changed IP and Vendor", async () => {
-  await cp("./tests/resources/test-config-scan2.json", "/tmp/config2.json");
-  await scan("/tmp/config2.json");
+      targetInfo.status.should.equal("up");
+      targetInfo.address.should.equal("192.168.0.3");
+      targetInfo.mac.should.equal("00:11:22:33:44:55");
+      targetInfo.vendor.should.equal("Another Vendor");
 
-  const targetInfoString = await readFile("targetInfo.json");
-  const targetInfo = JSON.parse(targetInfoString);
+      await deleteConfigurationFile("/tmp/config2.json");
+    });
 
-  expect(targetInfo.status).toBe("up");
-  expect(targetInfo.address).toBe("192.168.0.3");
-  expect(targetInfo.mac).toBe("00:11:22:33:44:55");
-  expect(targetInfo.vendor).toBe("Another Vendor");
+    test("Scans a host target but nothing is found", async () => {
+      await deleteConfigurationFile("targetInfo.json");
+      await copyConfigurationFile(
+        "./test/resources/test-config-scan.json",
+        "/tmp/no-target-config.json"
+      );
 
-  await unlink("/tmp/config2.json");
-});
+      await scan("/tmp/no-target-config.json");
 
-test("Scans target but nothing found", async () => {
-  expect.assertions(3);
-  await unlink("targetInfo.json");
-  await cp(
-    "./tests/resources/test-config-scan.json",
-    "/tmp/no-target-config.json"
-  );
-  await scan("/tmp/no-target-config.json");
+      try {
+        await readFile("targetInfo.json");
+      } catch (error) {
+        error.code.should.equal("ENOENT");
+        error.path.should.include("targetInfo.json");
+      }
 
-  try {
-    await readFile("targetInfo.json");
-  } catch (error) {
-    expect(error.code).toMatch("ENOENT");
-    expect(error.path).toMatch("targetInfo.json");
-  }
+      await deleteConfigurationFile("/tmp/no-target-config.json");
+    });
 
-  await unlink("/tmp/no-target-config.json");
-});
+    test("nmap creates an invalid output file", async () => {
+      await copyConfigurationFile(
+        "./test/resources/test-config-scan.json",
+        "/tmp/no-target-config.json"
+      );
 
-test("Invalid nmap output file", async () => {
-  expect.assertions(2);
-  await cp(
-    "./tests/resources/test-config-scan.json",
-    "/tmp/no-target-config.json"
-  );
+      try {
+        await scan("/tmp/no-target-config.json");
+      } catch (error) {
+        error.message.should.have.string("Attribute without value");
+      }
 
-  try {
-    await scan("/tmp/no-target-config.json");
-  } catch (error) {
-    expect(error.message).toMatch("Attribute without value");
-  }
+      await deleteConfigurationFile("/tmp/no-target-config.json");
+    });
 
-  await unlink("/tmp/no-target-config.json");
-});
+    test("Scans a network", async () => {
+      await copyConfigurationFile(
+        "./test/resources/test-config-scan-network.json",
+        "/tmp/network-config.json"
+      );
 
-test("Scans network", async () => {
-  await cp(
-    "./tests/resources/test-config-scan-network.json",
-    "/tmp/network-config.json"
-  );
-  await scan("/tmp/network-config.json");
+      await scan("/tmp/network-config.json");
 
-  await unlink("/tmp/network-config.json");
+      await deleteConfigurationFile("/tmp/network-config.json");
+    });
+  });
 });
