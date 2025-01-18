@@ -2,7 +2,7 @@
   "packageManager": "npm@9.0.0",
   "scripts": {
     "start": "node --experimental-sqlite index.mjs",
-    "test": "mocha"
+    "test": "cross-env 'NODE_OPTIONS=--experimental-loader @istanbuljs/esm-loader-hook' nyc --reporter=text --reporter=lcov mocha"
   },
   "mocha": {
     "node-option": [
@@ -22,12 +22,15 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
+    "@istanbuljs/esm-loader-hook": "^0.3.0",
     "@types/netmask": "^2.0.5",
     "@types/xml2js": "^0.4.14",
     "chai": "^5.1.2",
+    "cross-env": "^7.0.3",
     "eslint": "^9.14.0",
     "globals": "^15.11.0",
     "mocha": "^11.0.1",
+    "nyc": "^17.1.0",
     "sinon": "^19.0.2"
   }
 }
