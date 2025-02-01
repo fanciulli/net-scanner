@@ -19,7 +19,7 @@ async function collectTargetInfo() {
   const xml = await readFile("scan.xml");
   const xmlAsObj = await xmlParse(xml);
 
-  if (xmlAsObj.nmaprun.host) {
+  if (xmlAsObj.nmaprun?.host) {
     const host = xmlAsObj.nmaprun.host[0];
     const hostStatus = host.status[0].$.state;
 
@@ -65,10 +65,13 @@ async function analyseTargetInfo(targetInfo) {
       result["vendor"] == targetInfo.vendor
     ) {
       info(`Host with MAC Address: ${targetInfo.mac} is known`);
+      targetInfo.known = true;
     } else {
       info(`Host with MAC Address: ${targetInfo.mac} is updated`);
       updateHost(targetInfo.mac, targetInfo.address, targetInfo.vendor);
       info(message);
+
+      targetInfo.updated = true;
     }
   } else {
     storeHost(targetInfo.mac, targetInfo.address, targetInfo.vendor);
@@ -82,8 +85,44 @@ async function scanHost(host) {
   if (targetInfo) {
     await analyseTargetInfo(targetInfo);
     await saveTargetInfo(targetInfo);
+    return targetInfo;
+  } else {
+    return undefined;
   }
-  return true;
+}
+
+/**
+ * Generate a report based on the device scan report
+ */
+async function generateReport(scanResults) {
+  let report = scanResults
+    .filter((report) => report !== undefined)
+    .reduce(
+      (accumulator, report) => {
+        accumulator.total += 1;
+        if (report.known) {
+          accumulator.known += 1;
+        } else if (report.updated) {
+          accumulator.updated += 1;
+        }
+
+        return accumulator;
+      },
+      {
+        known: 0,
+        updated: 0,
+        total: 0,
+      }
+    );
+
+  const message =
+    "------------------------------------\n" +
+    `Known: ${report.known}\n` +
+    `Updated: ${report.updated}\n` +
+    `Total: ${report.total}\n` +
+    "------------------------------------";
+
+  info(message);
 }
 
 async function scan(configFile) {
@@ -92,24 +131,31 @@ async function scan(configFile) {
 
   initLogger(config);
 
+  let scanResults = [];
+  let ips = [];
+
   if (config.isTargetNetwork()) {
     const networkWithMask = `${config.target}/${config.netmask}`;
 
     info(`Scanning network ${networkWithMask}`);
     const netmask = new Netmask(networkWithMask);
 
-    var ips = [];
     netmask.forEach((ip) => {
       ips.push(ip);
     });
-
-    for (const ip of ips) {
-      await scanHost(ip);
-    }
-    info(`Done scanning network ${networkWithMask}`);
   } else {
-    info("Scanning host");
-    await scanHost(config.target);
+    info(`Scanning host ${config.target}`);
+
+    ips.push(config.target);
+  }
+
+  for (const ip of ips) {
+    let report = await scanHost(ip);
+    scanResults.push(report);
+  }
+
+  if (config.isScanReportEnabled()) {
+    await generateReport(scanResults);
   }
 }
 
