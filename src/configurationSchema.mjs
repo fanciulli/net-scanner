@@ -8,6 +8,15 @@ const configSchema = {
     netmask: {
       type: "integer",
     },
+    scan: {
+      type: "object",
+      properties: {
+        enableFinalReport: {
+          type: "boolean",
+          default: true,
+        },
+      },
+    },
     logger: {
       type: "object",
       properties: {

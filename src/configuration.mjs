@@ -2,7 +2,7 @@ import { readFile, access, constants } from "node:fs/promises";
 import { Ajv } from "ajv";
 import addFormats from "ajv-formats";
 
-const ajvInstance = new Ajv();
+const ajvInstance = new Ajv({ useDefaults: true });
 addFormats(ajvInstance);
 
 import { configSchema } from "./configurationSchema.mjs";
@@ -36,6 +36,16 @@ class Configuration {
   isTargetNetwork() {
     if (this._config !== undefined && this._config.netmask !== undefined) {
       return true;
+    } else {
+      return false;
+    }
+  }
+
+  isScanReportEnabled() {
+    let scanSection = this._config?.scan;
+
+    if (scanSection) {
+      return scanSection.enableFinalReport;
     } else {
       return false;
     }
