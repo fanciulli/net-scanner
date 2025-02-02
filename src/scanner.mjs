@@ -49,6 +49,13 @@ async function saveTargetInfo(targetInfo) {
   await writeFile("targetInfo.json", JSON.stringify(targetInfo));
 }
 
+function isSameHost(targetInfo, result) {
+  let address = targetInfo.address ? targetInfo.address : NA;
+  let vendor = targetInfo.vendor ? targetInfo.vendor : NA;
+
+  result["ip"] == address && result["vendor"] == vendor;
+}
+
 async function analyseTargetInfo(config, targetInfo) {
   const message =
     "------------------------------------\n" +
@@ -60,10 +67,7 @@ async function analyseTargetInfo(config, targetInfo) {
 
   const result = getHost(targetInfo.mac);
   if (result) {
-    if (
-      result["ip"] == targetInfo.address &&
-      result["vendor"] == targetInfo.vendor
-    ) {
+    if (isSameHost(targetInfo, result)) {
       targetInfo.known = true;
 
       if (config.isKnownDevicesReportEnabled()) {
