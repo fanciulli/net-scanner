@@ -11,7 +11,23 @@ const configSchema = {
     scan: {
       type: "object",
       properties: {
+        enableStartStopScanReport: {
+          type: "boolean",
+          default: true,
+        },
         enableFinalReport: {
+          type: "boolean",
+          default: true,
+        },
+        enableNewDevicesReport: {
+          type: "boolean",
+          default: true,
+        },
+        enableUpdatedDevicesReport: {
+          type: "boolean",
+          default: true,
+        },
+        enableKnownDevicesReport: {
           type: "boolean",
           default: true,
         },

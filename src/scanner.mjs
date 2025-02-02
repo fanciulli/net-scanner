@@ -49,7 +49,7 @@ async function saveTargetInfo(targetInfo) {
   await writeFile("targetInfo.json", JSON.stringify(targetInfo));
 }
 
-async function analyseTargetInfo(targetInfo) {
+async function analyseTargetInfo(config, targetInfo) {
   const message =
     "------------------------------------\n" +
     `IP Address: ${targetInfo.address}\n` +
@@ -64,26 +64,34 @@ async function analyseTargetInfo(targetInfo) {
       result["ip"] == targetInfo.address &&
       result["vendor"] == targetInfo.vendor
     ) {
-      info(`Host with MAC Address: ${targetInfo.mac} is known`);
       targetInfo.known = true;
-    } else {
-      info(`Host with MAC Address: ${targetInfo.mac} is updated`);
-      updateHost(targetInfo.mac, targetInfo.address, targetInfo.vendor);
-      info(message);
 
+      if (config.isKnownDevicesReportEnabled()) {
+        info(`Host with MAC Address: ${targetInfo.mac} is known`);
+      }
+    } else {
+      updateHost(targetInfo.mac, targetInfo.address, targetInfo.vendor);
       targetInfo.updated = true;
+
+      if (config.isUpdatedDevicesReportEnabled()) {
+        info(`Host with MAC Address: ${targetInfo.mac} is updated`);
+        info(message);
+      }
     }
   } else {
     storeHost(targetInfo.mac, targetInfo.address, targetInfo.vendor);
-    info(message);
+
+    if (config.isNewDevicesReportEnabled()) {
+      info(message);
+    }
   }
 }
 
-async function scanHost(host) {
+async function scanHost(config, host) {
   await scanTarget(host);
   const targetInfo = await collectTargetInfo();
   if (targetInfo) {
-    await analyseTargetInfo(targetInfo);
+    await analyseTargetInfo(config, targetInfo);
     await saveTargetInfo(targetInfo);
     return targetInfo;
   } else {
@@ -137,20 +145,25 @@ async function scan(configFile) {
   if (config.isTargetNetwork()) {
     const networkWithMask = `${config.target}/${config.netmask}`;
 
-    info(`Scanning network ${networkWithMask}`);
+    if (config.isStartStopScanReportEnabled()) {
+      info(`Scanning network ${networkWithMask}`);
+    }
+
     const netmask = new Netmask(networkWithMask);
 
     netmask.forEach((ip) => {
       ips.push(ip);
     });
   } else {
-    info(`Scanning host ${config.target}`);
+    if (config.isStartStopScanReportEnabled()) {
+      info(`Scanning host ${config.target}`);
+    }
 
     ips.push(config.target);
   }
 
   for (const ip of ips) {
-    let report = await scanHost(ip);
+    let report = await scanHost(config, ip);
     scanResults.push(report);
   }
 
