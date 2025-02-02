@@ -34,21 +34,35 @@ class Configuration {
   }
 
   isTargetNetwork() {
-    if (this._config !== undefined && this._config.netmask !== undefined) {
-      return true;
-    } else {
-      return false;
-    }
+    return this._config?.netmask ? true : false;
+  }
+
+  isStartStopScanReportEnabled() {
+    return this._config?.scan
+      ? this._config.scan.enableStartStopScanReport
+      : false;
   }
 
   isScanReportEnabled() {
-    let scanSection = this._config?.scan;
+    return this._config?.scan ? this._config.scan.enableFinalReport : false;
+  }
 
-    if (scanSection) {
-      return scanSection.enableFinalReport;
-    } else {
-      return false;
-    }
+  isNewDevicesReportEnabled() {
+    return this._config?.scan
+      ? this._config.scan.enableNewDevicesReport
+      : false;
+  }
+
+  isUpdatedDevicesReportEnabled() {
+    return this._config?.scan
+      ? this._config.scan.enableUpdatedDevicesReport
+      : false;
+  }
+
+  isKnownDevicesReportEnabled() {
+    return this._config?.scan
+      ? this._config.scan.enableKnownDevicesReport
+      : false;
   }
 
   get logger() {
