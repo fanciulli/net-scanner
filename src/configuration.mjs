@@ -37,32 +37,24 @@ class Configuration {
     return this._config?.netmask ? true : false;
   }
 
-  isStartStopScanReportEnabled() {
-    return this._config?.scan
-      ? this._config.scan.enableStartStopScanReport
-      : false;
+  reportStartScan() {
+    return this._config?.report ? this._config.report.begin : false;
   }
 
-  isScanReportEnabled() {
-    return this._config?.scan ? this._config.scan.enableFinalReport : false;
+  reportScanCompleted() {
+    return this._config?.report ? this._config.report.end : false;
   }
 
-  isNewDevicesReportEnabled() {
-    return this._config?.scan
-      ? this._config.scan.enableNewDevicesReport
-      : false;
+  reportNewDevices() {
+    return this._config?.report ? this._config.report.newDevices : false;
   }
 
-  isUpdatedDevicesReportEnabled() {
-    return this._config?.scan
-      ? this._config.scan.enableUpdatedDevicesReport
-      : false;
+  reportUpdatedDevices() {
+    return this._config?.report ? this._config.report.updatedDevices : false;
   }
 
-  isKnownDevicesReportEnabled() {
-    return this._config?.scan
-      ? this._config.scan.enableKnownDevicesReport
-      : false;
+  reportKnownDevices() {
+    return this._config?.report ? this._config.report.knownDevices : false;
   }
 
   get logger() {

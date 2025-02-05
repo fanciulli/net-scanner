@@ -1,12 +1,12 @@
 {
   "target": "192.168.0.2",
   "netmask": 24,
-  "scan": {
-    "enableStartStopScanReport": false,
-    "enableFinalReport": false,
-    "enableNewDevicesReport": false,
-    "enableUpdatedDevicesReport": false,
-    "enableKnownDevicesReport": false
+  "report": {
+    "begin": false,
+    "end": false,
+    "newDevices": false,
+    "updatedDevices": false,
+    "knownDevices": false
   },
   "logger": {
     "transport": "console"

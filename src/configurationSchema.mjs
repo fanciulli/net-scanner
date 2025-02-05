@@ -8,26 +8,26 @@ const configSchema = {
     netmask: {
       type: "integer",
     },
-    scan: {
+    report: {
       type: "object",
       properties: {
-        enableStartStopScanReport: {
+        begin: {
           type: "boolean",
           default: true,
         },
-        enableFinalReport: {
+        end: {
           type: "boolean",
           default: true,
         },
-        enableNewDevicesReport: {
+        newDevices: {
           type: "boolean",
           default: true,
         },
-        enableUpdatedDevicesReport: {
+        updatedDevices: {
           type: "boolean",
           default: true,
         },
-        enableKnownDevicesReport: {
+        knownDevices: {
           type: "boolean",
           default: true,
         },

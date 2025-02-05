@@ -160,130 +160,157 @@ describe("Configuration", () => {
       config.netmask.should.be.equal(24);
       config.isTargetNetwork().should.be.true;
     });
+  });
 
-    test("isNewDevicesReportEnabled", async () => {
+  describe("report flags", async () => {
+    test("reportNewDevices", async () => {
       let config = new Configuration();
       config._config = {
-        scan: {
-          enableNewDevicesReport: true,
+        report: {
+          newDevices: true,
         },
       };
 
-      config.isNewDevicesReportEnabled().should.be.true;
+      config.reportNewDevices().should.be.true;
 
       config._config = {
-        scan: {
-          enableNewDevicesReport: false,
+        report: {
+          newDevices: false,
         },
       };
 
-      config.isNewDevicesReportEnabled().should.be.false;
+      config.reportNewDevices().should.be.false;
 
       config._config = {};
-      config.isNewDevicesReportEnabled().should.be.false;
+      config.reportNewDevices().should.be.false;
 
       config._config = undefined;
-      config.isNewDevicesReportEnabled().should.be.false;
+      config.reportNewDevices().should.be.false;
     });
 
-    test("isScanReportEnabled", async () => {
+    test("reportScanCompleted", async () => {
       let config = new Configuration();
       config._config = {
-        scan: {
-          enableFinalReport: true,
+        report: {
+          end: true,
         },
       };
 
-      config.isScanReportEnabled().should.be.true;
+      config.reportScanCompleted().should.be.true;
 
       config._config = {
-        scan: {
-          enableFinalReport: false,
+        report: {
+          end: false,
         },
       };
 
-      config.isScanReportEnabled().should.be.false;
+      config.reportScanCompleted().should.be.false;
 
       config._config = {};
-      config.isScanReportEnabled().should.be.false;
+      config.reportScanCompleted().should.be.false;
 
       config._config = undefined;
-      config.isScanReportEnabled().should.be.false;
+      config.reportScanCompleted().should.be.false;
     });
 
-    test("isUpdatedDevicesReportEnabled", async () => {
+    test("reportUpdatedDevices", async () => {
       let config = new Configuration();
       config._config = {
-        scan: {
-          enableUpdatedDevicesReport: true,
+        report: {
+          updatedDevices: true,
         },
       };
 
-      config.isUpdatedDevicesReportEnabled().should.be.true;
+      config.reportUpdatedDevices().should.be.true;
 
       config._config = {
-        scan: {
-          enableUpdatedDevicesReport: false,
+        report: {
+          updatedDevices: false,
         },
       };
 
-      config.isUpdatedDevicesReportEnabled().should.be.false;
+      config.reportUpdatedDevices().should.be.false;
 
       config._config = {};
-      config.isUpdatedDevicesReportEnabled().should.be.false;
+      config.reportUpdatedDevices().should.be.false;
 
       config._config = undefined;
-      config.isUpdatedDevicesReportEnabled().should.be.false;
+      config.reportUpdatedDevices().should.be.false;
     });
 
-    test("isKnownDevicesReportEnabled", async () => {
+    test("reportKnownDevices", async () => {
       let config = new Configuration();
       config._config = {
-        scan: {
-          enableKnownDevicesReport: true,
+        report: {
+          knownDevices: true,
         },
       };
 
-      config.isKnownDevicesReportEnabled().should.be.true;
+      config.reportKnownDevices().should.be.true;
 
       config._config = {
-        scan: {
-          enableKnownDevicesReport: false,
+        report: {
+          knownDevices: false,
         },
       };
 
-      config.isKnownDevicesReportEnabled().should.be.false;
+      config.reportKnownDevices().should.be.false;
 
       config._config = {};
-      config.isKnownDevicesReportEnabled().should.be.false;
+      config.reportKnownDevices().should.be.false;
 
       config._config = undefined;
-      config.isKnownDevicesReportEnabled().should.be.false;
+      config.reportKnownDevices().should.be.false;
     });
 
-    test("isStartStopScanReportEnabled", async () => {
+    test("reportStartScan", async () => {
       let config = new Configuration();
       config._config = {
-        scan: {
-          enableStartStopScanReport: true,
+        report: {
+          begin: true,
         },
       };
 
-      config.isStartStopScanReportEnabled().should.be.true;
+      config.reportStartScan().should.be.true;
 
       config._config = {
-        scan: {
-          enableStartStopScanReport: false,
+        report: {
+          begin: false,
         },
       };
 
-      config.isStartStopScanReportEnabled().should.be.false;
+      config.reportStartScan().should.be.false;
 
       config._config = {};
-      config.isStartStopScanReportEnabled().should.be.false;
+      config.reportStartScan().should.be.false;
 
       config._config = undefined;
-      config.isStartStopScanReportEnabled().should.be.false;
+      config.reportStartScan().should.be.false;
+    });
+
+    test("reportNewDevices", async () => {
+      let config = new Configuration();
+      config._config = {
+        report: {
+          newDevices: true,
+        },
+      };
+
+      config.reportNewDevices().should.be.true;
+
+      config._config = {
+        report: {
+          newDevices: false,
+        },
+      };
+
+      config.reportNewDevices().should.be.false;
+
+      config._config = {};
+      config.reportNewDevices().should.be.false;
+
+      config._config = undefined;
+      config.reportNewDevices().should.be.false;
     });
   });
 });
