@@ -46,7 +46,7 @@ describe("Scanner", async () => {
   });
 
   describe("scan()", () => {
-    test("Scans a host target", async function () {
+    test("Scans a host target", async () => {
       await copyConfigurationFile(
         "./test/resources/test-config-scan.json",
         "/tmp/config1.json"

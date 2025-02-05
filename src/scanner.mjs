@@ -1,60 +1,12 @@
 import { Configuration } from "./configuration.mjs";
 import { initLogger, info } from "./logging.mjs";
-import { parseStringPromise as xmlParse } from "xml2js";
-import { readFile, writeFile } from "node:fs/promises";
-import { promisify } from "node:util";
-import childProcess from "node:child_process";
+import { writeFile } from "node:fs/promises";
+import { scanner as scannerNMAP } from "./nmapScanner.mjs";
 import { Netmask } from "netmask";
 import { getHost, storeHost, updateHost } from "./database.mjs";
 
-const executeShell = promisify(childProcess.exec);
-
 const NA = "N/A";
-
-async function scanTarget(target) {
-  await executeShell("sudo nmap -sn -oX scan.xml " + target);
-}
-
-async function collectTargetInfo() {
-  const xml = await readFile("scan.xml");
-  const xmlAsObj = await xmlParse(xml);
-
-  if (xmlAsObj.nmaprun?.host) {
-    const host = xmlAsObj.nmaprun.host[0];
-    const hostStatus = host.status[0].$.state;
-
-    const addresses = host.address;
-
-    const ipv4AddressSection = addresses.find(
-      (address) => address.$.addrtype == "ipv4"
-    );
-    const ipv4Address = ipv4AddressSection ? ipv4AddressSection.$.addr : NA;
-
-    const macAddressSection = addresses.find(
-      (address) => address.$.addrtype == "mac"
-    );
-    const macAddress = macAddressSection ? macAddressSection.$.addr : NA;
-    const vendor = macAddressSection ? macAddressSection.$.vendor : NA;
-
-    return {
-      status: hostStatus,
-      address: ipv4Address,
-      mac: macAddress,
-      vendor: vendor,
-    };
-  }
-}
-
-async function saveTargetInfo(targetInfo) {
-  await writeFile("targetInfo.json", JSON.stringify(targetInfo));
-}
-
-function isSameHost(targetInfo, result) {
-  let address = targetInfo.address ? targetInfo.address : NA;
-  let vendor = targetInfo.vendor ? targetInfo.vendor : NA;
-
-  result["ip"] == address && result["vendor"] == vendor;
-}
+const scanner = new scannerNMAP();
 
 async function analyseTargetInfo(config, targetInfo) {
   const message =
@@ -67,17 +19,20 @@ async function analyseTargetInfo(config, targetInfo) {
 
   const result = getHost(targetInfo.mac);
   if (result) {
-    if (isSameHost(targetInfo, result)) {
+    let address = targetInfo.address ? targetInfo.address : NA;
+    let vendor = targetInfo.vendor ? targetInfo.vendor : NA;
+
+    if (result["ip"] == address && result["vendor"] == vendor) {
       targetInfo.known = true;
 
-      if (config.isKnownDevicesReportEnabled()) {
+      if (config.reportKnownDevices()) {
         info(`Host with MAC Address: ${targetInfo.mac} is known`);
       }
     } else {
       updateHost(targetInfo.mac, targetInfo.address, targetInfo.vendor);
       targetInfo.updated = true;
 
-      if (config.isUpdatedDevicesReportEnabled()) {
+      if (config.reportUpdatedDevices()) {
         info(`Host with MAC Address: ${targetInfo.mac} is updated`);
         info(message);
       }
@@ -85,18 +40,17 @@ async function analyseTargetInfo(config, targetInfo) {
   } else {
     storeHost(targetInfo.mac, targetInfo.address, targetInfo.vendor);
 
-    if (config.isNewDevicesReportEnabled()) {
+    if (config.reportNewDevices()) {
       info(message);
     }
   }
 }
 
 async function scanHost(config, host) {
-  await scanTarget(host);
-  const targetInfo = await collectTargetInfo();
+  const targetInfo = await scanner.scan(host);
   if (targetInfo) {
     await analyseTargetInfo(config, targetInfo);
-    await saveTargetInfo(targetInfo);
+    await writeFile("targetInfo.json", JSON.stringify(targetInfo));
     return targetInfo;
   } else {
     return undefined;
@@ -149,7 +103,7 @@ async function scan(configFile) {
   if (config.isTargetNetwork()) {
     const networkWithMask = `${config.target}/${config.netmask}`;
 
-    if (config.isStartStopScanReportEnabled()) {
+    if (config.reportStartScan()) {
       info(`Scanning network ${networkWithMask}`);
     }
 
@@ -159,7 +113,7 @@ async function scan(configFile) {
       ips.push(ip);
     });
   } else {
-    if (config.isStartStopScanReportEnabled()) {
+    if (config.reportStartScan()) {
       info(`Scanning host ${config.target}`);
     }
 
@@ -171,7 +125,7 @@ async function scan(configFile) {
     scanResults.push(report);
   }
 
-  if (config.isScanReportEnabled()) {
+  if (config.reportScanCompleted()) {
     await generateReport(scanResults);
   }
 }
