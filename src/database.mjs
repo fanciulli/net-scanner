@@ -38,4 +38,4 @@ function getHost(mac) {
   return result.length == 1 ? result[0] : undefined;
 }
 
-export { getHost, storeHost, updateHost };
+export { getHost, storeHost, updateHost, database };
