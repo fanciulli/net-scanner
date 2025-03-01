@@ -1,10 +1,8 @@
 import { describe, test, before, after } from "mocha";
 import sinon from "sinon";
 import "chai/register-should.js";
-import { DatabaseSync } from "node:sqlite";
+import { database } from "../src/database.mjs";
 import { copyConfigurationFile, deleteConfigurationFile } from "./utils.mjs";
-
-const database = new DatabaseSync("scan-db.sqlite");
 
 let execStub;
 let scanner;
