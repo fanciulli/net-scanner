@@ -1,7 +1,7 @@
 import { access, readFile, writeFile } from "node:fs/promises";
 import { rmSync } from "node:fs";
 import { Command } from "commander";
-import { scan } from "./src/scanner.mjs";
+import { Scanner } from "./src/scanner.mjs";
 import process from "node:process";
 
 const LOCK_FILE = ".lock";
@@ -34,7 +34,8 @@ async function execute() {
       "Application output may be redirected to other transports. Please check configuration file."
     );
 
-    await scan(options.config);
+    const scanner = new Scanner();
+    await scanner.scan(options.config);
   }
 }
 

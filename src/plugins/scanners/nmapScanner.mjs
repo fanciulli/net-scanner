@@ -46,4 +46,4 @@ class nmapScanner {
   }
 }
 
-export { nmapScanner as scanner };
+export { nmapScanner as scannerPlugin };
