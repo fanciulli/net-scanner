@@ -1,4 +1,4 @@
-import { describe, test, after } from "mocha";
+import { describe, test, before, after } from "mocha";
 import { cp } from "fs/promises";
 import child_process from "node:child_process";
 import sinon from "sinon";
@@ -9,39 +9,46 @@ const should = shouldFun();
 const HOST = "192.168.0.2";
 const NA = "N/A";
 
-const execStub = sinon
-  .stub(child_process, "exec")
-  .onCall(0)
-  .callsFake((command, callback) => {
-    command.should.be.equal(`sudo nmap -sn -oX scan.xml ${HOST}`);
-    cp("test/resources/nmap.invalid.xml", "scan.xml").then(() => callback());
-  })
-  .onCall(1)
-  .callsFake((command, callback) => {
-    command.should.be.equal(`sudo nmap -sn -oX scan.xml ${HOST}`);
-    cp("test/resources/nmap.empty.xml", "scan.xml").then(() => callback());
-  })
-  .onCall(2)
-  .callsFake((command, callback) => {
-    command.should.be.equal(`sudo nmap -sn -oX scan.xml ${HOST}`);
-    cp("test/resources/nmap.192.168.0.2.noinfo.xml", "scan.xml").then(() =>
-      callback()
-    );
-  })
-  .onCall(3)
-  .callsFake((command, callback) => {
-    command.should.be.equal(`sudo nmap -sn -oX scan.xml ${HOST}`);
-    cp("test/resources/nmap.192.168.0.2.xml", "scan.xml").then(() =>
-      callback()
-    );
-  });
-
-const { scanner } = await import(
-  "../../../src/plugins/scanners/nmapScanner.mjs"
-);
-const nmapScanner = new scanner();
+let execStub;
+let nmapScanner;
 
 describe("nmapScanner", async () => {
+  before(async function setup() {
+    execStub = sinon
+      .stub(child_process, "exec")
+      .onCall(0)
+      .callsFake((command, callback) => {
+        command.should.be.equal(`sudo nmap -sn -oX scan.xml ${HOST}`);
+        cp("test/resources/nmap.invalid.xml", "scan.xml").then(() =>
+          callback()
+        );
+      })
+      .onCall(1)
+      .callsFake((command, callback) => {
+        command.should.be.equal(`sudo nmap -sn -oX scan.xml ${HOST}`);
+        cp("test/resources/nmap.empty.xml", "scan.xml").then(() => callback());
+      })
+      .onCall(2)
+      .callsFake((command, callback) => {
+        command.should.be.equal(`sudo nmap -sn -oX scan.xml ${HOST}`);
+        cp("test/resources/nmap.192.168.0.2.noinfo.xml", "scan.xml").then(() =>
+          callback()
+        );
+      })
+      .onCall(3)
+      .callsFake((command, callback) => {
+        command.should.be.equal(`sudo nmap -sn -oX scan.xml ${HOST}`);
+        cp("test/resources/nmap.192.168.0.2.xml", "scan.xml").then(() =>
+          callback()
+        );
+      });
+
+    const { scannerPlugin } = await import(
+      "../../../src/plugins/scanners/nmapScanner.mjs"
+    );
+    nmapScanner = new scannerPlugin();
+  });
+
   after(function restore() {
     execStub.restore();
   });

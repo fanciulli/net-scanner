@@ -2,14 +2,7 @@
   "packageManager": "npm@9.0.0",
   "scripts": {
     "start": "node --experimental-sqlite index.mjs",
-    "test": "cross-env 'NODE_OPTIONS=--experimental-loader @istanbuljs/esm-loader-hook' nyc --reporter=text --reporter=lcov mocha"
-  },
-  "mocha": {
-    "node-option": [
-      "experimental-vm-modules",
-      "experimental-sqlite"
-    ],
-    "spec:": "tests"
+    "test": "cross-env 'NODE_OPTIONS=--experimental-loader @istanbuljs/esm-loader-hook' nyc --reporter=text --reporter=lcov mocha --jobs 1 test/**/*.test.mjs"
   },
   "dependencies": {
     "@youngkiu/pino-slack-webhook": "^0.1.2",
