@@ -41,7 +41,7 @@ describe("Scanner", async () => {
           status: "up",
           address: "192.168.0.2",
           mac: "00:11:22:33:44:55",
-          vendor: "My Vendor",
+          vendor: "My Vendor2",
         };
       })
       .onCall(2)
@@ -108,7 +108,7 @@ describe("Scanner", async () => {
 
       await deleteConfigurationFile("/tmp/config1.json");
 
-      execStub.callCount.should.equal(1);
+      execStub.callCount.should.equal(2);
 
       assertDBContent(1);
     });
@@ -120,6 +120,8 @@ describe("Scanner", async () => {
       );
 
       await scanner.scan("/tmp/config2.json");
+
+      execStub.callCount.should.equal(3);
 
       await deleteConfigurationFile("/tmp/config2.json");
 
@@ -134,6 +136,8 @@ describe("Scanner", async () => {
 
       await scanner.scan("/tmp/no-target-config.json");
 
+      execStub.callCount.should.equal(4);
+
       await deleteConfigurationFile("/tmp/no-target-config.json");
 
       assertDBContent(1);
@@ -146,6 +150,8 @@ describe("Scanner", async () => {
       );
 
       await scanner.scan("/tmp/network-config.json");
+
+      execStub.callCount.should.equal(258);
 
       await deleteConfigurationFile("/tmp/network-config.json");
 
