@@ -36,6 +36,16 @@ describe("Scanner", async () => {
       })
       .onCall(1)
       .callsFake((host) => {
+        host.should.equal("192.168.0.2");
+        return {
+          status: "up",
+          address: "192.168.0.2",
+          mac: "00:11:22:33:44:55",
+          vendor: "My Vendor",
+        };
+      })
+      .onCall(2)
+      .callsFake((host) => {
         host.should.equal("192.168.0.3");
         return {
           status: "up",
@@ -44,7 +54,7 @@ describe("Scanner", async () => {
           vendor: "My Vendor 2",
         };
       })
-      .onCall(2)
+      .onCall(3)
       .callsFake((host) => {
         host.should.equal("192.168.0.2");
         return {
@@ -74,6 +84,21 @@ describe("Scanner", async () => {
 
   describe("scan()", () => {
     test("Scans a host target", async () => {
+      await copyConfigurationFile(
+        "./test/resources/test-config-scan.json",
+        "/tmp/config1.json"
+      );
+
+      await scanner.scan("/tmp/config1.json");
+
+      await deleteConfigurationFile("/tmp/config1.json");
+
+      execStub.callCount.should.equal(1);
+
+      assertDBContent(1);
+    });
+
+    test("Scans a known host target", async () => {
       await copyConfigurationFile(
         "./test/resources/test-config-scan.json",
         "/tmp/config1.json"

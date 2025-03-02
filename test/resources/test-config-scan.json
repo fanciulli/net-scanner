@@ -1,11 +1,11 @@
 {
   "target": "192.168.0.2",
   "report": {
-    "begin": false,
-    "end": false,
-    "newDevices": false,
-    "updatedDevices": false,
-    "knownDevices": false
+    "begin": true,
+    "end": true,
+    "newDevices": true,
+    "updatedDevices": true,
+    "knownDevices": true
   },
   "logger": {
     "transport": "console"
