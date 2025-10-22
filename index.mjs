@@ -2,6 +2,7 @@ import { access, readFile, writeFile } from "node:fs/promises";
 import { rmSync } from "node:fs";
 import { Command } from "commander";
 import { Scanner } from "./src/scanner.mjs";
+import { CronJob } from 'cron';
 import process from "node:process";
 
 const LOCK_FILE = ".lock";
@@ -39,4 +40,11 @@ async function execute() {
   }
 }
 
-execute();
+const job = new CronJob(
+	'0 */5 * * * *',
+	execute, 
+	null, 
+	false, 
+	'America/Los_Angeles' // timeZone
+);
+job.start();
