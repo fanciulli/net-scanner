@@ -45,7 +45,7 @@ async function execute() {
 }
 
 const job = new CronJob(
-	'0 */5 * * * *',
+	'0 0 * * * *',
 	execute, 
 	null, 
 	false, 
