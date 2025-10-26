@@ -1,4 +1,4 @@
-import { access, readFile, writeFile } from "node:fs/promises";
+import { access, readFile, writeFile, rm } from "node:fs/promises";
 import { rmSync } from "node:fs";
 import { Command } from "commander";
 import { Scanner } from "./src/scanner.mjs";
@@ -26,17 +26,21 @@ async function execute() {
     await access(LOCK_FILE);
     console.log("Another instance of the application is running. Exiting...");
   } catch {
-    await writeFile(LOCK_FILE, "LOCK");
+    try {
+      await writeFile(LOCK_FILE, "LOCK");
 
-    const header = await readFile("./res/header.txt", "utf-8");
-    console.log(header);
-    console.log();
-    console.log(
-      "Application output may be redirected to other transports. Please check configuration file."
-    );
+      const header = await readFile("./res/header.txt", "utf-8");
+      console.log(header);
+      console.log();
+      console.log(
+        "Application output may be redirected to other transports. Please check configuration file."
+      );
 
-    const scanner = new Scanner();
-    await scanner.scan(options.config);
+      const scanner = new Scanner();
+      await scanner.scan(options.config);
+    } finally {
+      await rm(LOCK_FILE, { force: true });
+    }
   }
 }
 
